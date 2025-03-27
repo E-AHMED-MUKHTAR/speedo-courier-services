@@ -10,10 +10,24 @@ const xlsx = require("xlsx");
 const fs = require("fs");
 
 
+app.set('view engine', 'ejs');
+// Application.use(express.static('public'));
+app.use(express.static('uploads'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('views', path.join(__dirname, 'views'));
+// // استخدام المكونات المتوسطة (middleware) لتحليل البيانات
+Application.use(express.urlencoded({ extended: false }));
+Application.use(express.json());
+
+
+
+
+
+
 
 const upload = multer({ storage: multer.memoryStorage() });
-app.set("view engine", "ejs");
-app.use(express.static("public"));
+
+
 app.get("/", (req, res) => {
     res.render("upload");
 });
