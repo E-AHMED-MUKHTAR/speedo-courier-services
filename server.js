@@ -4,7 +4,7 @@ const xlsx = require("xlsx");
 const path = require("path");
 const fs = require("fs");
 const app = express();
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.get("/", (req, res) => {
