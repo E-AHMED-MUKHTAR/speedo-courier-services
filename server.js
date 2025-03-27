@@ -4,6 +4,7 @@ const xlsx = require("xlsx");
 const path = require("path");
 const fs = require("fs");
 const app = express();
+const port = process.env.PORT || 1000;
 const upload = multer({ storage: multer.memoryStorage() });
 app.set("view engine", "ejs");
 app.use(express.static("public"));
@@ -160,6 +161,6 @@ app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (r
         res.json({ error: "حدث خطأ أثناء معالجة الملفات." });
     }
 });
-const PORT = 3000;
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
