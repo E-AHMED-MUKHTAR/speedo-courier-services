@@ -15,8 +15,8 @@ app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (r
     try {
         const speedafFile = req.files["speedaf"][0].path;
         const speedoFile = req.files["speedo"][0].path;
-        const speedafSheet = xlsx.readFile(speedafFile).Sheets[xlsx.readFile(speedafFile).SheetNames[0]];
-        const speedoSheet = xlsx.readFile(speedoFile).Sheets[xlsx.readFile(speedoFile).SheetNames[0]];
+        const speedafSheet = xlsx.read(req.files["speedaf"][0].buffer, { type: "buffer" }).Sheets;
+        const speedoSheet = xlsx.read(req.files["speedo"][0].buffer, { type: "buffer" }).Sheets;
         const speedafData = xlsx.utils.sheet_to_json(speedafSheet);
         const speedoData = xlsx.utils.sheet_to_json(speedoSheet);
         const speedafMap = {};
