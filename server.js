@@ -5,6 +5,7 @@ const path = require("path");
 const fs = require("fs");
 const app = express();
 const port = process.env.PORT || 1000;
+require('dotenv').config();
 const upload = multer({ storage: multer.memoryStorage() });
 app.set("view engine", "ejs");
 app.use(express.static("public"));
