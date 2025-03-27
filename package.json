@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node application.js",
     "dev": "nodemon server.js"
   },
   "author": "",
@@ -18,5 +18,8 @@
     "nodemon": "^3.1.9",
     "path": "^0.12.7",
     "xlsx": "^0.18.5"
+  },
+  "engines": {
+    "node": "19.8.1"
   }
 }
