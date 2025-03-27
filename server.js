@@ -25,8 +25,8 @@ app.use(express.json());
 
 
 
-// const upload = multer({ storage: multer.memoryStorage() });
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
+// const upload = multer({ dest: "uploads/" });
 
 app.get("/", (req, res) => {
     res.render("upload");
