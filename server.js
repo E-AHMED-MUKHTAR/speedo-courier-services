@@ -47,7 +47,7 @@ app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (r
         const speedafSheet = xlsx.read(req.files["speedaf"][0].buffer, { type: "buffer" }).Sheets;
         const speedoSheet = xlsx.read(req.files["speedo"][0].buffer, { type: "buffer" }).Sheets;
 
-        
+
         const speedafData = xlsx.utils.sheet_to_json(speedafSheet);
         const speedoData = xlsx.utils.sheet_to_json(speedoSheet);
         const speedafMap = {};
@@ -180,12 +180,29 @@ app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (r
             .filter(row => row !== null);
         const newSheet = xlsx.utils.json_to_sheet(mergedData);
         const newWorkbook = xlsx.utils.book_new();
+       
+       
         xlsx.utils.book_append_sheet(newWorkbook, newSheet, "Processed Data");
         const outputPath = path.join(__dirname, "public", "processed.xlsx");
         xlsx.writeFile(newWorkbook, outputPath);
-        fs.unlinkSync(speedafFile);
-        fs.unlinkSync(speedoFile);
-        res.json({ results: mergedData, fileUrl: "/processed.xlsx" });
+        // fs.unlinkSync(speedafFile);
+        // fs.unlinkSync(speedoFile);
+        // res.json({ results: mergedData, fileUrl: "/processed.xlsx" });
+        res.setHeader("Content-Disposition", "attachment; filename=processed.xlsx");
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        
+        const buffer = xlsx.write(newWorkbook, { type: "buffer", bookType: "xlsx" });
+        res.send(buffer);
+
+
+
+
+        // const fileBuffer = xlsx.write(newWorkbook, { type: "buffer", bookType: "xlsx" });
+        // res.setHeader("Content-Disposition", "attachment; filename=processed.xlsx");
+        // res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        // res.send(fileBuffer);
+
+
     } catch (error) {
         console.error(" خطأ أثناء معالجة الملفات:", error);
         res.json({ error: "حدث خطأ أثناء معالجة الملفات." });
