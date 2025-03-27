@@ -366,7 +366,7 @@ app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (r
         res.setHeader("Content-Disposition", "attachment; filename=processed.xlsx");
         res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         res.send(excelBuffer);
-        
+        res.json({ results: mergedData, fileUrl: "/download" });
         
     } catch (error) {
         console.error(" خطأ أثناء معالجة الملفات:", error);
