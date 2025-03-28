@@ -361,13 +361,17 @@ app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (r
        
         xlsx.utils.book_append_sheet(newWorkbook, newSheet, "Processed Data");
         
-        const excelBuffer = xlsx.write(newWorkbook, { type: "buffer", bookType: "xlsx" });
+        // const outputPath = path.join(__dirname, "public", "processed.xlsx");
+        // xlsx.writeFile(newWorkbook, outputPath);
+        // fs.unlinkSync(speedafFile);
+        // fs.unlinkSync(speedoFile);
+        // res.json({ results: mergedData, fileUrl: "/processed.xlsx" });
 
+        const wbout = xlsx.write(newWorkbook, { type: "buffer", bookType: "xlsx" });
         res.setHeader("Content-Disposition", "attachment; filename=processed.xlsx");
         res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        res.send(excelBuffer);
-        res.json({ results: mergedData, fileUrl: "/download" });
-        
+        res.send(wbout);
+
     } catch (error) {
         console.error(" خطأ أثناء معالجة الملفات:", error);
         res.json({ error: "حدث خطأ أثناء معالجة الملفات." });
