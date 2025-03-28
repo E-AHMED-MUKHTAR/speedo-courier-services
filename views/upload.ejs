@@ -43,7 +43,7 @@
         }
 
 
-
+     
 
         body {
             background-color: #f8f9fa;
@@ -87,24 +87,22 @@
             background: white;
             z-index: 2;
         }
-
         .tm-footer-link {
-            color: white;
-        }
+  color: white;
+}
 
-        .tm-footer-link:hover,
-        .tm-footer-link:focus {
-            color: #aacbea;
-        }
-
-        .tm-footer {
-            background-color: #567086;
-            padding-top: 30px;
-            padding-bottom: 30px;
-            -webkit-box-shadow: 0 -3px 5px 0 rgba(69, 92, 113, 0.59);
-            -moz-box-shadow: 0 -3px 5px 0 rgba(69, 92, 113, 0.59);
-            box-shadow: 0 -3px 5px 0 rgba(69, 92, 113, 0.59);
-        }
+.tm-footer-link:hover,
+.tm-footer-link:focus {
+  color: #aacbea;
+}
+.tm-footer {
+  background-color: #567086;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  -webkit-box-shadow: 0 -3px 5px 0 rgba(69, 92, 113, 0.59);
+  -moz-box-shadow: 0 -3px 5px 0 rgba(69, 92, 113, 0.59);
+  box-shadow: 0 -3px 5px 0 rgba(69, 92, 113, 0.59);
+}
     </style>
 </head>
 
@@ -144,12 +142,12 @@
 
 
 
-        <!-- <div class="sidebar2">
+        <div class="sidebar2">
 
 
             <h5>احصائيات</h5>
            
-        </div> -->
+        </div>
         <div id="result" class="result-container">
             <h4>نتائج المعالجة:</h4>
 
@@ -174,9 +172,9 @@
                             <th>الربح</th>
                             <th>التحصيل</th>
                             <th>التوريد</th>
-                            <th>إسم المرسل إليه</th>
-                            <th>Type</th>
-
+                            <th>إسم المرسل إليه</th>     
+                            <th>Type</th>                           
+                                                
                         </tr>
                     </thead>
                     <tbody id="result-table"></tbody>
@@ -187,8 +185,7 @@
     <footer class="tm-footer row tm-mt-small">
         <div class="col-12 font-weight-light">
             <p class="text-center text-white mb-0 px-4 small">
-                Developed by : <a href="https://www.linkedin.com/in/ahmd-mukhtar" target="_blank"
-                    class="tm-footer-link">Engineer MUKHTAR</a>
+                Developed by : <a  href="https://www.linkedin.com/in/ahmd-mukhtar" target="_blank" class="tm-footer-link">Engineer MUKHTAR</a>
             </p>
         </div>
     </footer>
@@ -196,8 +193,13 @@
     <script>
         let allData = [];
         function updateTable(data) {
+
+
+
+            
             let resultTable = document.getElementById("result-table");
             resultTable.innerHTML = "";
+
             let totalcommission = 0, totalshipping = 0, totalSupply = 0, totalcollection = 0, totalProfit = 0, totalcollect = 0, totalfuel = 0;
 
             data.forEach((row, index) => {
@@ -214,7 +216,9 @@
                         <td>${row.supply}</td>
                          <td>${row.receiver}</td>
                         <td style="background-color: ${row.typeColor}">${row.type}</td>`;
+                       
                 resultTable.appendChild(tr);
+
                 totalcollect += row.supply;
                 totalshipping += row.shipping;
                 totalcommission += row.commission;
@@ -223,95 +227,120 @@
                 totalfuel += row.fuel;
                 totalSupply = totalcollect;
 
+
+
+                // 
+              
+
+// 
+
             });
 
             document.getElementById("total-supply").textContent = totalSupply.toFixed(2);
             document.getElementById("total-profit").textContent = totalProfit.toFixed(2);
             document.getElementById("total-collection").textContent = totalcollection.toFixed(2);
-            let selectedSenders = new Set();
-            function updateSendersList() {
-                let uniqueSenders = [...new Set(allData.map(row => row.sender))];
-                let sendersList = document.getElementById("senders-list");
-                sendersList.innerHTML = "";
-                uniqueSenders.forEach(sender => {
-                    let senderItem = document.createElement("li");
-                    senderItem.classList.add("list-group-item", "list-group-item-action");
-                    senderItem.textContent = sender;
-                    senderItem.addEventListener("click", function () {
-                        selectedSenders.add(sender);
-                        filterByLatestSender(sender);
-                        highlightSenders();
-                    });
+        }
 
-                    sendersList.appendChild(senderItem);
+
+
+        // 
+  
+
+
+
+
+
+        // 
+        let selectedSenders = new Set();
+
+        function updateSendersList() {
+            let uniqueSenders = [...new Set(allData.map(row => row.sender))];
+            let sendersList = document.getElementById("senders-list");
+            sendersList.innerHTML = "";
+
+            uniqueSenders.forEach(sender => {
+                let senderItem = document.createElement("li");
+                senderItem.classList.add("list-group-item", "list-group-item-action");
+                senderItem.textContent = sender;
+                senderItem.addEventListener("click", function () {
+                    selectedSenders.add(sender);
+                    filterByLatestSender(sender);
+                    highlightSenders();
                 });
 
-                highlightSenders();
-            }
-            function filterByLatestSender(name) {
-                let filteredData = allData.filter(row => row.sender === name);
-                updateTable(filteredData);
-            }
-            function highlightSenders() {
-                let senderItems = document.querySelectorAll("#senders-list .list-group-item");
-                senderItems.forEach(item => {
-                    if (selectedSenders.has(item.textContent)) {
-                        item.classList.add("active");
-                    }
-                });
-            }
-            document.getElementById("show-all").addEventListener("click", function () {
-                updateTable(allData);
-                highlightSenders();
+                sendersList.appendChild(senderItem);
             });
 
+            highlightSenders();
+        }
 
-            // document.getElementById("upload-form").addEventListener("submit", function (event) {
-            //     event.preventDefault();
-            //     let formData = new FormData(this);
-            //     let resultDiv = document.getElementById("result");
-            //     let resultTable = document.getElementById("result-table");
-            //     resultDiv.style.display = "block";
-            //     resultTable.innerHTML = "";
+        function filterByLatestSender(name) {
+            let filteredData = allData.filter(row => row.sender === name);
+            updateTable(filteredData);
+        }
 
-            //     fetch("/upload", { method: "POST", body: formData })
-            //         .then(response => response.json())
-            //         .then(data => {
-            //             if (data.error) {
-            //                 alert(data.error);
-            //             } else {
-            //                 allData = data.results;
-            //                 updateTable(allData);
-            //                 updateSendersList();
-            //             }
-            //         });
-            // });
+        function highlightSenders() {
+            let senderItems = document.querySelectorAll("#senders-list .list-group-item");
+            senderItems.forEach(item => {
+                if (selectedSenders.has(item.textContent)) {
+                    item.classList.add("active");
+                }
+            });
+        }
 
-            document.getElementById("upload-form").addEventListener("submit", function (event) {
-    event.preventDefault();
-    let formData = new FormData(this);
+        document.getElementById("show-all").addEventListener("click", function () {
+            updateTable(allData);
+            highlightSenders();
+        });
+// 
 
-    fetch("/upload", {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.blob()) // استقبال البيانات كـ blob (ملف)
-    .then(blob => {
-        let url = window.URL.createObjectURL(blob);
-        let a = document.createElement("a");
-        a.href = url;
-        a.download = "processed.xlsx"; // اسم الملف عند التحميل
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-    })
-    .catch(error => {
-        console.error("Error downloading file:", error);
-        alert("حدث خطأ أثناء معالجة الملفات.");
-    });
-});
+// 
+
+        document.getElementById("upload-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+            let resultDiv = document.getElementById("result");
+            let resultTable = document.getElementById("result-table");
+            resultDiv.style.display = "block";
+            resultTable.innerHTML = "";
+
+            fetch("/upload", { method: "POST", body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        allData = data.results;
+                        updateTable(allData);
+                        updateSendersList();
+                    }
+                });
+        });
+
+
+
+        // analysis
+      
+
+
+
+    
+
+
+
+
+
+
+
 
     </script>
+  
+  
+
+
+
+
+
 </body>
 
 </html>

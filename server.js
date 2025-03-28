@@ -198,33 +198,50 @@
 
 
 // app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
-
-
-
 const express = require("express");
 const app = express();
 const path = require("path");
 require('dotenv').config();
 const port = process.env.PORT || 1000;
+
 const multer = require("multer");
 const xlsx = require("xlsx");
+
 const fs = require("fs");
 app.set('view engine', 'ejs');
+
 app.use(express.static('uploads'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
+
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-const upload = multer({ storage: multer.memoryStorage() });
+
+
+// const upload = multer({ storage: multer.memoryStorage() });
+
+const upload = multer({ dest: "uploads/" });
 app.get("/", (req, res) => {
     res.render("upload");
 });
+
+
 app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (req, res) => {
     try {
-        const speedafBuffer = req.files["speedaf"][0].buffer;
-        const speedoBuffer = req.files["speedo"][0].buffer;
-        const speedafSheet = xlsx.read(req.files["speedaf"][0].buffer, { type: "buffer" }).Sheets;
-        const speedoSheet = xlsx.read(req.files["speedo"][0].buffer, { type: "buffer" }).Sheets;
+
+        // const speedafBuffer = req.files["speedaf"][0].buffer;
+        // const speedoBuffer = req.files["speedo"][0].buffer;
+ const speedafFile = req.files["speedaf"][0].path;
+ const speedoFile = req.files["speedo"][0].path;
+
+
+
+        // const speedafSheet = xlsx.read(req.files["speedaf"][0].buffer, { type: "buffer" }).Sheets;
+        // const speedoSheet = xlsx.read(req.files["speedo"][0].buffer, { type: "buffer" }).Sheets;
+ const speedafSheet = xlsx.readFile(speedafFile).Sheets[xlsx.readFile(speedafFile).SheetNames[0]];
+ const speedoSheet = xlsx.readFile(speedoFile).Sheets[xlsx.readFile(speedoFile).SheetNames[0]];
+
+
         const speedafData = xlsx.utils.sheet_to_json(speedafSheet);
         const speedoData = xlsx.utils.sheet_to_json(speedoSheet);
         const speedafMap = {};
@@ -360,18 +377,13 @@ app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (r
        
        
         xlsx.utils.book_append_sheet(newWorkbook, newSheet, "Processed Data");
+        const outputPath = path.join(__dirname, "public", "processed.xlsx");
+        xlsx.writeFile(newWorkbook, outputPath);
+        fs.unlinkSync(speedafFile);
+        fs.unlinkSync(speedoFile);
+        res.json({ results: mergedData, fileUrl: "/processed.xlsx" });
+
         
-        // const outputPath = path.join(__dirname, "public", "processed.xlsx");
-        // xlsx.writeFile(newWorkbook, outputPath);
-        // fs.unlinkSync(speedafFile);
-        // fs.unlinkSync(speedoFile);
-        // res.json({ results: mergedData, fileUrl: "/processed.xlsx" });
-
-        const wbout = xlsx.write(newWorkbook, { type: "buffer", bookType: "xlsx" });
-        res.setHeader("Content-Disposition", "attachment; filename=processed.xlsx");
-        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        res.send(wbout);
-
     } catch (error) {
         console.error(" خطأ أثناء معالجة الملفات:", error);
         res.json({ error: "حدث خطأ أثناء معالجة الملفات." });
