@@ -219,8 +219,12 @@ app.use(express.json());
 
 
 // const upload = multer({ storage: multer.memoryStorage() });
+// 1
+const storage = multer.memoryStorage();
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "uploads/" ,  storage: storage });
+
+
 app.get("/", (req, res) => {
     res.render("upload");
 });
@@ -228,18 +232,19 @@ app.get("/", (req, res) => {
 
 app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (req, res) => {
     try {
+// 2
+        const speedafBuffer = req.files["speedaf"][0].buffer;
+        const speedoBuffer = req.files["speedo"][0].buffer;
 
-        // const speedafBuffer = req.files["speedaf"][0].buffer;
-        // const speedoBuffer = req.files["speedo"][0].buffer;
- const speedafFile = req.files["speedaf"][0].path;
- const speedoFile = req.files["speedo"][0].path;
+//  const speedafFile = req.files["speedaf"][0].path;
+//  const speedoFile = req.files["speedo"][0].path;
 
 
-
-        // const speedafSheet = xlsx.read(req.files["speedaf"][0].buffer, { type: "buffer" }).Sheets;
-        // const speedoSheet = xlsx.read(req.files["speedo"][0].buffer, { type: "buffer" }).Sheets;
- const speedafSheet = xlsx.readFile(speedafFile).Sheets[xlsx.readFile(speedafFile).SheetNames[0]];
- const speedoSheet = xlsx.readFile(speedoFile).Sheets[xlsx.readFile(speedoFile).SheetNames[0]];
+// 3
+        const speedafSheet = xlsx.read(req.files["speedaf"][0].buffer, { type: "buffer" }).Sheets;
+        const speedoSheet = xlsx.read(req.files["speedo"][0].buffer, { type: "buffer" }).Sheets;
+//  const speedafSheet = xlsx.readFile(speedafFile).Sheets[xlsx.readFile(speedafFile).SheetNames[0]];
+//  const speedoSheet = xlsx.readFile(speedoFile).Sheets[xlsx.readFile(speedoFile).SheetNames[0]];
 
 
         const speedafData = xlsx.utils.sheet_to_json(speedafSheet);
@@ -372,16 +377,54 @@ app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (r
                 return null;
             })
             .filter(row => row !== null);
+            
+
+
+
+
+
+
+
+
+
+
+            
         const newSheet = xlsx.utils.json_to_sheet(mergedData);
         const newWorkbook = xlsx.utils.book_new();
-       
-       
+
         xlsx.utils.book_append_sheet(newWorkbook, newSheet, "Processed Data");
-        const outputPath = path.join(__dirname, "public", "processed.xlsx");
-        xlsx.writeFile(newWorkbook, outputPath);
+
+        // تحويل الملف إلى Buffer بدلاً من حفظه على السيرفر
+        const buffer = xlsx.write(newWorkbook, { type: "buffer", bookType: "xlsx" });
+        
+        // حذف الملفات المرفوعة بعد معالجتها
         fs.unlinkSync(speedafFile);
         fs.unlinkSync(speedoFile);
-        res.json({ results: mergedData, fileUrl: "/processed.xlsx" });
+        
+        // إرسال الملف للمستخدم مباشرة كتنزيل
+        res.setHeader("Content-Disposition", "attachment; filename=processed.xlsx");
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.send(buffer);
+
+
+
+
+
+
+
+
+        // xlsx.utils.book_append_sheet(newWorkbook, newSheet, "Processed Data");
+        // const outputPath = path.join(__dirname, "public", "processed.xlsx");
+        // xlsx.writeFile(newWorkbook, outputPath);
+        // fs.unlinkSync(speedafFile);
+        // fs.unlinkSync(speedoFile);
+        // res.json({ results: mergedData, fileUrl: "/processed.xlsx" });
+
+
+
+
+
+
 
         
     } catch (error) {
