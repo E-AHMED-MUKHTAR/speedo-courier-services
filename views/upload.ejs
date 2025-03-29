@@ -317,27 +317,43 @@
         //         });
         // });
 
-        document.getElementById("upload-form").addEventListener("submit", function (event) {
+    
+javascript
+Copy
+Edit
+document.getElementById("upload-form").addEventListener("submit", function (event) {
     event.preventDefault();
     let formData = new FormData(this);
+    let resultDiv = document.getElementById("result");
+    let resultTable = document.getElementById("result-table");
+    resultDiv.style.display = "block";
+    resultTable.innerHTML = "";
 
     fetch("/upload", { method: "POST", body: formData })
         .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.error || "حدث خطأ غير معروف"); });
+            const contentType = response.headers.get("content-type");
+            if (contentType.includes("application/json")) {
+                return response.json();
+            } else {
+                return response.blob();
             }
-            return response.blob();
         })
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "processed.xlsx";
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
+        .then(data => {
+            if (data instanceof Blob) {
+                // ✅ تنزيل الملف
+                const url = window.URL.createObjectURL(data);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "processed.xlsx";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } else if (data.results) {
+                // ✅ عرض البيانات في الجدول
+                updateTable(data.results);
+            }
         })
-        .catch(error => alert(error.message));
+        .catch(error => alert("حدث خطأ: " + error.message));
 });
 
         // analysis
