@@ -220,9 +220,13 @@ app.use(express.json());
 
 // const upload = multer({ storage: multer.memoryStorage() });
 // 1
-const storage = multer.memoryStorage();
+// const storage = multer.memoryStorage();
 
-const upload = multer({ dest: "uploads/" ,  storage: storage });
+// const upload = multer({ dest: "uploads/" ,  storage: storage });
+
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 
 app.get("/", (req, res) => {
@@ -233,19 +237,16 @@ app.get("/", (req, res) => {
 app.post("/upload", upload.fields([{ name: "speedaf" }, { name: "speedo" }]), (req, res) => {
     try {
 // 2
-        const speedafBuffer = req.files["speedaf"][0].buffer;
-        const speedoBuffer = req.files["speedo"][0].buffer;
+const speedafBuffer = req.files["speedaf"][0].buffer;
+const speedoBuffer = req.files["speedo"][0].buffer;
 
-//  const speedafFile = req.files["speedaf"][0].path;
-//  const speedoFile = req.files["speedo"][0].path;
+// قراءة ملفات Excel من الذاكرة مباشرة
+const speedafWorkbook = xlsx.read(speedafBuffer, { type: "buffer" });
+const speedoWorkbook = xlsx.read(speedoBuffer, { type: "buffer" });
 
-
-// 3
-        const speedafSheet = xlsx.read(req.files["speedaf"][0].buffer, { type: "buffer" }).Sheets;
-        const speedoSheet = xlsx.read(req.files["speedo"][0].buffer, { type: "buffer" }).Sheets;
-//  const speedafSheet = xlsx.readFile(speedafFile).Sheets[xlsx.readFile(speedafFile).SheetNames[0]];
-//  const speedoSheet = xlsx.readFile(speedoFile).Sheets[xlsx.readFile(speedoFile).SheetNames[0]];
-
+// الحصول على أول ورقة بيانات من كل ملف
+const speedafSheet = speedafWorkbook.Sheets[speedafWorkbook.SheetNames[0]];
+const speedoSheet = speedoWorkbook.Sheets[speedoWorkbook.SheetNames[0]];
 
         const speedafData = xlsx.utils.sheet_to_json(speedafSheet);
         const speedoData = xlsx.utils.sheet_to_json(speedoSheet);
