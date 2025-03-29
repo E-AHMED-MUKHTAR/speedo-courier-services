@@ -250,6 +250,7 @@ const speedoSheet = speedoWorkbook.Sheets[speedoWorkbook.SheetNames[0]];
 
         const speedafData = xlsx.utils.sheet_to_json(speedafSheet);
         const speedoData = xlsx.utils.sheet_to_json(speedoSheet);
+        
         const speedafMap = {};
         speedafData.forEach(row => {
             const waybill = row["Waybill No."]?.toString().trim();
@@ -399,8 +400,7 @@ const speedoSheet = speedoWorkbook.Sheets[speedoWorkbook.SheetNames[0]];
         const buffer = xlsx.write(newWorkbook, { type: "buffer", bookType: "xlsx" });
         
         // حذف الملفات المرفوعة بعد معالجتها
-        fs.unlinkSync(speedafFile);
-        fs.unlinkSync(speedoFile);
+ 
         
         // إرسال الملف للمستخدم مباشرة كتنزيل
         res.setHeader("Content-Disposition", "attachment; filename=processed.xlsx");
