@@ -121,32 +121,10 @@
             <button type="submit" class="btn btn-upload">رفع ومعالجة الملفات</button>
         </form>
         <button id="show-all" class="btn btn-primary btn-sm w-100 mt-2">عرض الكل</button>
+        <a href="/history" class="btn btn-outline-secondary mt-3">عرض السجل</a>
         <div class="sidebar">
             <h5>العملاء</h5>
             <ul id="senders-list" class="list-group"></ul>
-        </div>
-
-        <!--  analysis -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        <div class="sidebar2">
-
-
-            <h5>احصائيات</h5>
-           
         </div>
         <div id="result" class="result-container">
             <h4>نتائج المعالجة:</h4>
@@ -189,194 +167,124 @@
             </p>
         </div>
     </footer>
+<script>
+    let allData = [];
 
-    <script>
-        let allData = [];
-        function updateTable(data) {
+    function updateTable(data) {
+        let resultTable = document.getElementById("result-table");
+        resultTable.innerHTML = "";
 
+        let totalcommission = 0, totalshipping = 0, totalSupply = 0, totalcollection = 0, totalProfit = 0, totalcollect = 0, totalfuel = 0;
 
+        data.forEach((row, index) => {
+            let tr = document.createElement("tr");
+            tr.innerHTML = `<td>${index + 1}</td>
+                    <td>${row.waybill}</td>
+                    <td>${row.sender}</td>
+                    <td>${row.weight}</td>
+                    <td>${row.shipping}</td>
+                    <td>${row.commission}</td>
+                    <td>${row.total}</td>
+                    <td>${row.profit}</td>
+                    <td>${row.collectionName}</td>
+                    <td>${row.supply}</td>
+                    <td>${row.receiver}</td>
+                    <td style="background-color: ${row.typeColor}">${row.type}</td>`;
+            resultTable.appendChild(tr);
 
-            
-            let resultTable = document.getElementById("result-table");
-            resultTable.innerHTML = "";
-
-            let totalcommission = 0, totalshipping = 0, totalSupply = 0, totalcollection = 0, totalProfit = 0, totalcollect = 0, totalfuel = 0;
-
-            data.forEach((row, index) => {
-                let tr = document.createElement("tr");
-                tr.innerHTML = `<td>${index + 1}</td>
-                        <td>${row.waybill}</td>
-                        <td>${row.sender}</td>
-                        <td>${row.weight}</td>
-                        <td>${row.shipping}</td>
-                        <td>${row.commission}</td>
-                        <td>${row.total}</td>
-                        <td>${row.profit}</td>
-                        <td>${row.collection}</td>
-                        <td>${row.supply}</td>
-                         <td>${row.receiver}</td>
-                        <td style="background-color: ${row.typeColor}">${row.type}</td>`;
-                       
-                resultTable.appendChild(tr);
-
-                totalcollect += row.supply;
-                totalshipping += row.shipping;
-                totalcommission += row.commission;
-                totalProfit = totalshipping - totalcommission - 0.1 * totalcommission;
-                totalcollection += row.collection;
-                totalfuel += row.fuel;
-                totalSupply = totalcollect;
-
-
-
-                // 
-              
-
-// 
-
-            });
-
-            document.getElementById("total-supply").textContent = totalSupply.toFixed(2);
-            document.getElementById("total-profit").textContent = totalProfit.toFixed(2);
-            document.getElementById("total-collection").textContent = totalcollection.toFixed(2);
-        }
-
-
-
-        // 
-  
-
-
-
-
-
-        // 
-        let selectedSenders = new Set();
-
-        function updateSendersList() {
-            let uniqueSenders = [...new Set(allData.map(row => row.sender))];
-            let sendersList = document.getElementById("senders-list");
-            sendersList.innerHTML = "";
-
-            uniqueSenders.forEach(sender => {
-                let senderItem = document.createElement("li");
-                senderItem.classList.add("list-group-item", "list-group-item-action");
-                senderItem.textContent = sender;
-                senderItem.addEventListener("click", function () {
-                    selectedSenders.add(sender);
-                    filterByLatestSender(sender);
-                    highlightSenders();
-                });
-
-                sendersList.appendChild(senderItem);
-            });
-
-            highlightSenders();
-        }
-
-        function filterByLatestSender(name) {
-            let filteredData = allData.filter(row => row.sender === name);
-            updateTable(filteredData);
-        }
-
-        function highlightSenders() {
-            let senderItems = document.querySelectorAll("#senders-list .list-group-item");
-            senderItems.forEach(item => {
-                if (selectedSenders.has(item.textContent)) {
-                    item.classList.add("active");
-                }
-            });
-        }
-
-        document.getElementById("show-all").addEventListener("click", function () {
-            updateTable(allData);
-            highlightSenders();
+            totalcollect += row.supply;
+            totalshipping += row.shipping;
+            totalcommission += row.commission;
+            totalProfit = totalshipping - totalcommission - 0.1 * totalcommission;
+            totalcollection += row.collectionName;
+            totalfuel += row.fuel;
+            totalSupply = totalcollect;
         });
-// 
 
-// 
+        document.getElementById("total-supply").textContent = totalSupply.toFixed(2);
+        document.getElementById("total-profit").textContent = totalProfit.toFixed(2);
+        document.getElementById("total-collection").textContent = totalcollection.toFixed(2);
+    }
 
-        // document.getElementById("upload-form").addEventListener("submit", function (event) {
-        //     event.preventDefault();
-        //     let formData = new FormData(this);
-        //     let resultDiv = document.getElementById("result");
-        //     let resultTable = document.getElementById("result-table");
-        //     resultDiv.style.display = "block";
-        //     resultTable.innerHTML = "";
+    let selectedSenders = new Set();
 
-        //     fetch("/upload", { method: "POST", body: formData })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.error) {
-        //                 alert(data.error);
-        //             } else {
-        //                 allData = data.results;
-        //                 updateTable(allData);
-        //                 updateSendersList();
-        //             }
-        //         });
-        // });
+    function updateSendersList() {
+        let uniqueSenders = [...new Set(allData.map(row => row.sender))];
+        let sendersList = document.getElementById("senders-list");
+        sendersList.innerHTML = "";
 
-    
-javascript
-Copy
-Edit
-document.getElementById("upload-form").addEventListener("submit", function (event) {
-    event.preventDefault();
-    let formData = new FormData(this);
-    let resultDiv = document.getElementById("result");
-    let resultTable = document.getElementById("result-table");
-    resultDiv.style.display = "block";
-    resultTable.innerHTML = "";
+        uniqueSenders.forEach(sender => {
+            let senderItem = document.createElement("li");
+            senderItem.classList.add("list-group-item", "list-group-item-action");
+            senderItem.textContent = sender;
+            senderItem.addEventListener("click", function () {
+                selectedSenders.add(sender);
+                filterByLatestSender(sender);
+                highlightSenders();
+            });
+            sendersList.appendChild(senderItem);
+        });
 
-    fetch("/upload", { method: "POST", body: formData })
-        .then(response => {
-            const contentType = response.headers.get("content-type");
-            if (contentType.includes("application/json")) {
-                return response.json();
-            } else {
-                return response.blob();
+        highlightSenders();
+    }
+
+    function filterByLatestSender(name) {
+        let filteredData = allData.filter(row => row.sender === name);
+        updateTable(filteredData);
+    }
+
+    function highlightSenders() {
+        let senderItems = document.querySelectorAll("#senders-list .list-group-item");
+        senderItems.forEach(item => {
+            if (selectedSenders.has(item.textContent)) {
+                item.classList.add("active");
             }
-        })
-        .then(data => {
-            if (data instanceof Blob) {
-                // ✅ تنزيل الملف
-                const url = window.URL.createObjectURL(data);
+        });
+    }
+
+    document.getElementById("show-all").addEventListener("click", function () {
+        updateTable(allData);
+        highlightSenders();
+    });
+
+    document.getElementById("upload-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        let formData = new FormData(this);
+        let resultDiv = document.getElementById("result");
+        let resultTable = document.getElementById("result-table");
+        resultDiv.style.display = "block";
+        resultTable.innerHTML = "";
+
+        fetch("/upload", { method: "POST", body: formData })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || "حدث خطأ غير معروف"); });
+                }
+                return response.json();
+            })
+            .then(res => {
+            
+                const byteCharacters = atob(res.buffer);
+                const byteNumbers = new Array(byteCharacters.length).fill().map((_, i) => byteCharacters.charCodeAt(i));
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+                const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
                 a.download = "processed.xlsx";
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
-            } else if (data.results) {
-                // ✅ عرض البيانات في الجدول
-                updateTable(data.results);
-            }
-        })
-        .catch(error => alert("حدث خطأ: " + error.message));
-});
 
-        // analysis
-      
-
-
-
-    
-
-
-
-
-
-
-
-
-    </script>
-  
-  
-
-
-
-
+             
+                allData = res.data;
+                updateTable(allData);
+                updateSendersList();
+            })
+            .catch(error => alert(error.message));
+    });
+</script>
 
 </body>
 
